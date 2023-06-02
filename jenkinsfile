@@ -1,0 +1,75 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout code from version control
+                git 'https://github.com/anildevops7702/jenkins2.git'
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                // Build the code
+                sh 'mvn clean compile'
+            }
+        }
+        
+        stage('Unit Tests') {
+            steps {
+                // Run unit tests
+                sh 'mvn test'
+            }
+        }
+        
+        stage('Code Analysis') {
+            steps {
+                // Perform static code analysis
+                sh 'mvn sonar:sonar'
+            }
+        }
+        
+        stage('Package') {
+            steps {
+                // Package the application
+                sh 'mvn package'
+            }
+        }
+        
+        stage('Deploy to Staging') {
+            steps {
+                // Deploy to staging environment
+                sh 'ansible-playbook -i inventory/staging playbook.yml'
+            }
+        }
+        
+        stage('Integration Tests') {
+            steps {
+                // Run integration tests
+                sh 'mvn integration-test'
+            }
+        }
+        
+        stage('Deploy to Production') {
+            steps {
+                // Deploy to production environment
+                sh 'ansible-playbook -i inventory/production playbook.yml'
+            }
+        }
+        
+        stage('Post-Deployment Tests') {
+            steps {
+                // Run post-deployment tests
+                sh 'mvn verify'
+            }
+        }
+        
+        stage('Notify') {
+            steps {
+                // Send notifications or alerts on pipeline status
+                sh 'echo "Pipeline completed"'
+            }
+        }
+    }
+}
